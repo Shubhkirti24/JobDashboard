@@ -1,0 +1,262 @@
+select distinct a.soc_id as ability_soc_id, a.element_name as abilities_element, a.level as abilities_level, b.importance as abilities_importance,
+(a.level + b.importance)/2 as average_ability
+ from 
+(select k.soc_id, k.element_name, k.data_value as Level from abilities k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.element_name, k.data_value as Importance from abilities k where k.scale_name = 'Importance')b 
+
+order by average_ability desc
+
+
+
+all  :
+
+
+with skills_combine as
+
+select distinct a.soc_id as skills_soc_id, a.title as skills_title, a.level as skills_level, b.importance as skills_importance,
+ (a.level + b.importance)/2 as average_skills
+ from 
+(select k.soc_id, k.title, k.data_value as Level from skills k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.data_value as Importance from skills k where k.scale_name = 'Importance')b
+order by average_skills desc
+
+,
+
+knowledge_combine as
+
+select distinct a.soc_id as knowledge_soc_id, a.title as knowledge_title, a.level as knowledge_level, b.importance as knowledge_importance,
+ (a.level + b.importance)/2 as average_knowledge
+ from 
+(select k.soc_id, k.title, k.data_value as Level from knowledge k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.data_value as Importance from knowledge k where k.scale_name = 'Importance')b
+order by average_skills desc
+
+,
+
+
+ability_combine as
+
+select distinct a.soc_id as ability_soc_id, a.title as abilities_title, a.level as abilities_level, b.importance as abilities_importance,
+(a.level + b.importance)/2 as average_ability
+ from 
+(select k.soc_id, k.title, k.data_value as Level from abilities k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.data_value as Importance from abilities k where k.scale_name = 'Importance')b 
+
+order by average_ability desc
+
+
+
+
+all_competence :
+
+
+SELECT DISTINCT
+    s.soc_id,
+    s.title,
+    s.skills_level,
+    s.skills_importance,
+    s.average_skills,
+    k.knowledge_level,
+    k.knowledge_importance,
+    k.average_knowledge,
+    a.abilities_level,
+    a.abilities_importance,
+    a.average_ability,
+(s.average_skills + k.average_knowledge + a.average_ability)/3 as overall_average
+FROM (
+    SELECT
+        soc_id,
+        title,
+        MAX(CASE scale_name WHEN 'Level' THEN data_value END) AS skills_level,
+        MAX(CASE scale_name WHEN 'Importance' THEN data_value END) AS skills_importance,
+        (MAX(CASE scale_name WHEN 'Level' THEN data_value END) + MAX(CASE scale_name WHEN 'Importance' THEN data_value END))/2 AS average_skills
+    FROM skills
+    WHERE scale_name IN ('Level', 'Importance')
+    GROUP BY soc_id, title
+) s
+JOIN (
+    SELECT
+        soc_id,
+        title,
+        MAX(CASE scale_name WHEN 'Level' THEN data_value END) AS knowledge_level,
+        MAX(CASE scale_name WHEN 'Importance' THEN data_value END) AS knowledge_importance,
+        (MAX(CASE scale_name WHEN 'Level' THEN data_value END) + MAX(CASE scale_name WHEN 'Importance' THEN data_value END))/2 AS average_knowledge
+    FROM knowledge
+    WHERE scale_name IN ('Level', 'Importance')
+    GROUP BY soc_id, title
+) k ON s.soc_id = k.soc_id AND s.title = k.title
+JOIN (
+    SELECT
+        soc_id,
+        title,
+        MAX(CASE scale_name WHEN 'Level' THEN data_value END) AS abilities_level,
+        MAX(CASE scale_name WHEN 'Importance' THEN data_value END) AS abilities_importance,
+        (MAX(CASE scale_name WHEN 'Level' THEN data_value END) + MAX(CASE scale_name WHEN 'Importance' THEN data_value END))/2 AS average_ability
+    FROM abilities
+    WHERE scale_name IN ('Level', 'Importance')
+    GROUP BY soc_id, title
+) a ON s.soc_id = a.soc_id AND s.title = a.title
+
+
+
+adding bls :
+
+With bls_projections_2 as
+
+(select p.title, p.employed, p.occupation_opening_annual_avg, p.employed_10_projection,
+p.median_annual_wage from bls_projections p
+where p.title in (Select distinct title from skills)
+and p.median_annual_wage is not null
+and p.year = 2021)
+
+
+SELECT DISTINCT
+s.soc_id,
+s.title,
+s.skills_level,
+s.skills_importance,
+s.average_skills,
+k.knowledge_level,
+k.knowledge_importance,
+k.average_knowledge,
+a.abilities_level,
+a.abilities_importance,
+a.average_ability,
+(s.average_skills + k.average_knowledge + a.average_ability)/3 as overall_average,
+p.employed,
+p.occupation_opening_annual_avg,
+p.median_annual_wage,
+p.employed_10_projection
+FROM (
+SELECT
+soc_id,
+title,
+MAX(CASE scale_name WHEN 'Level' THEN data_value END) AS skills_level,
+MAX(CASE scale_name WHEN 'Importance' THEN data_value END) AS skills_importance,
+(MAX(CASE scale_name WHEN 'Level' THEN data_value END) + MAX(CASE scale_name WHEN 'Importance' THEN data_value END))/2 AS average_skills
+FROM skills
+WHERE scale_name IN ('Level', 'Importance')
+GROUP BY soc_id, title
+) s
+JOIN (
+SELECT
+soc_id,
+title,
+MAX(CASE scale_name WHEN 'Level' THEN data_value END) AS knowledge_level,
+MAX(CASE scale_name WHEN 'Importance' THEN data_value END) AS knowledge_importance,
+(MAX(CASE scale_name WHEN 'Level' THEN data_value END) + MAX(CASE scale_name WHEN 'Importance' THEN data_value END))/2 AS average_knowledge
+FROM knowledge
+WHERE scale_name IN ('Level', 'Importance')
+GROUP BY soc_id, title
+) k ON s.soc_id = k.soc_id AND s.title = k.title
+JOIN (
+SELECT
+soc_id,
+title,
+MAX(CASE scale_name WHEN 'Level' THEN data_value END) AS abilities_level,
+MAX(CASE scale_name WHEN 'Importance' THEN data_value END) AS abilities_importance,
+(MAX(CASE scale_name WHEN 'Level' THEN data_value END) + MAX(CASE scale_name WHEN 'Importance' THEN data_value END))/2 AS average_ability
+FROM abilities
+WHERE scale_name IN ('Level', 'Importance')
+GROUP BY soc_id, title
+) a ON s.soc_id = a.soc_id AND s.title = a.title
+
+JOIN bls_projections_2 p ON s.title = p.title
+
+order by p.median_annual_wage desc
+
+
+
+
+Final wage check :
+
+With bls_projections_2 as
+
+(select DISTINCT p.soc_nems_id, p.title, p.employed, p.occupation_opening_annual_avg, p.employed_10_projection,
+p.median_annual_wage from bls_projections p
+where p.title in (Select distinct title from skills)
+and p.median_annual_wage is not null
+and p.year = 2021)
+
+
+
+SELECT DISTINCT
+s.soc_id,
+s.title,
+s.skills_level,
+s.skills_importance,
+s.average_skills,
+k.knowledge_level,
+k.knowledge_importance,
+k.average_knowledge,
+a.abilities_level,
+a.abilities_importance,
+a.average_ability,
+(s.average_skills + k.average_knowledge + a.average_ability)/3 as overall_competency,
+p.soc_nems_id,
+p.employed,
+p.occupation_opening_annual_avg,
+p.median_annual_wage,
+p.employed_10_projection
+FROM (
+SELECT
+soc_id,
+title,
+MAX(CASE scale_name WHEN 'Level' THEN data_value END) AS skills_level,
+MAX(CASE scale_name WHEN 'Importance' THEN data_value END) AS skills_importance,
+(MAX(CASE scale_name WHEN 'Level' THEN data_value END) + MAX(CASE scale_name WHEN 'Importance' THEN data_value END))/2 AS average_skills
+FROM skills
+WHERE scale_name IN ('Level', 'Importance')
+GROUP BY soc_id, title
+) s
+JOIN (
+SELECT
+soc_id,
+title,
+MAX(CASE scale_name WHEN 'Level' THEN data_value END) AS knowledge_level,
+MAX(CASE scale_name WHEN 'Importance' THEN data_value END) AS knowledge_importance,
+(MAX(CASE scale_name WHEN 'Level' THEN data_value END) + MAX(CASE scale_name WHEN 'Importance' THEN data_value END))/2 AS average_knowledge
+FROM knowledge
+WHERE scale_name IN ('Level', 'Importance')
+GROUP BY soc_id, title
+) k ON s.soc_id = k.soc_id AND s.title = k.title
+JOIN (
+SELECT
+soc_id,
+title,
+MAX(CASE scale_name WHEN 'Level' THEN data_value END) AS abilities_level,
+MAX(CASE scale_name WHEN 'Importance' THEN data_value END) AS abilities_importance,
+(MAX(CASE scale_name WHEN 'Level' THEN data_value END) + MAX(CASE scale_name WHEN 'Importance' THEN data_value END))/2 AS average_ability
+FROM abilities
+WHERE scale_name IN ('Level', 'Importance')
+GROUP BY soc_id, title
+) a ON s.soc_id = a.soc_id AND s.title = a.title
+
+JOIN bls_projections_2 p ON s.soc_id LIKE p.soc_nems_id || '%'
+
+order by p.median_annual_wage desc
+
+
+
+
+Occupations : transfer / openings (EMP Change):
+
+
+SELECT DISTINCT s.soc_id,b.matrix_title, b.employment_20, b.employment_30, b.occ_transfer_rate, b.occ_openings, b.emp_change
+FROM bls_occ_sep_opening_2022 b, (
+    SELECT DISTINCT soc_id FROM skills
+) s
+WHERE s.soc_id LIKE b.matrix_code|| '%'
+
+
+Experience level :
+
+select distinct s.soc_id, j.title, j.job_zone as experience_level, f.risk_group  from job_zones j
+JOIN skills s ON s.soc_id LIKE j.soc_id || '%'
+JOIN future_of_work_bg f ON s.soc_id LIKE f.soc_id || '%'
+where j.job_zone in (select distinct job_zone from job_zone_refs)
+

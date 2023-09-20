@@ -1,0 +1,310 @@
+select a.soc_id, a.title, a.element_name as knowledge_element_name, a.level as knowledge_level, b.importance as knowledge_importance
+ from 
+(select k.soc_id, k.title, k.element_name, k.data_value as Level from knowledge k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.element_name, k.data_value as Importance from knowledge k where k.scale_name = 'Importance')b
+
+
+
+
+next :
+
+Select * from
+
+(select a.soc_id as ability_soc_id, a.title as abilities_title, a.element_name as abilities_element_name, a.level as abilities_level, b.importance as abilities_importance
+ from 
+(select k.soc_id, k.title, k.element_name, k.data_value as Level from abilities k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.element_name, k.data_value as Importance from abilities k where k.scale_name = 'Importance')b)ability
+
+join
+
+(select a.soc_id as knowledge_soc_id, a.title as knowledge_title, a.element_name as knowledge_element_name, a.level as knowledge_level, b.importance as knowledge_importance
+ from 
+(select k.soc_id, k.title, k.element_name, k.data_value as Level from knowledge k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.element_name, k.data_value as Importance from knowledge k where k.scale_name = 'Importance')b)know
+
+on ability.ability_soc_id = know.knowledge_soc_id
+
+where ability.abilities_title = know.knowledge_title
+
+
+
+next : 2
+
+Select * from
+
+(select a.soc_id as ability_soc_id, a.title as abilities_title, a.element_name as abilities_element_name, a.level as abilities_level, b.importance as abilities_importance,
+ (a.level + b.importance)/2 as average_ability
+ from 
+(select k.soc_id, k.title, k.element_name, k.data_value as Level from abilities k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.element_name, k.data_value as Importance from abilities k where k.scale_name = 'Importance')b)ability
+
+join
+
+(select a.soc_id as knowledge_soc_id, a.title as knowledge_title, a.element_name as knowledge_element_name, a.level as knowledge_level, b.importance as knowledge_importance, 
+(a.level + b.importance)/2 as average_knowledge
+ from 
+(select k.soc_id, k.title, k.element_name, k.data_value as Level from knowledge k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.element_name, k.data_value as Importance from knowledge k where k.scale_name = 'Importance')b)know
+
+on ability.ability_soc_id = know.knowledge_soc_id
+
+where ability.abilities_title = know.knowledge_title
+
+
+
+
+next : 3
+
+
+
+Select * from
+
+(select a.soc_id as ability_soc_id, a.title as abilities_title, a.element_name as abilities_element_name, a.level as abilities_level, b.importance as abilities_importance,
+ (a.level + b.importance)/2 as average_ability
+ from 
+(select k.soc_id, k.title, k.element_name, k.data_value as Level from abilities k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.element_name, k.data_value as Importance from abilities k where k.scale_name = 'Importance')b)ability
+
+join
+
+(select a.soc_id as knowledge_soc_id, a.title as knowledge_title, a.element_name as knowledge_element_name, a.level as knowledge_level, b.importance as knowledge_importance, 
+(a.level + b.importance)/2 as average_knowledge
+ from 
+(select k.soc_id, k.title, k.element_name, k.data_value as Level from knowledge k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.element_name, k.data_value as Importance from knowledge k where k.scale_name = 'Importance')b)know
+
+join
+
+(select a.soc_id as knowledge_soc_id, a.title as knowledge_title, a.element_name as knowledge_element_name, a.level as knowledge_level, b.importance as knowledge_importance, 
+(a.level + b.importance)/2 as average_knowledge
+ from 
+(select k.soc_id, k.title, k.element_name, k.data_value as Level from knowledge k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.element_name, k.data_value as Importance from knowledge k where k.scale_name = 'Importance')b)know
+
+
+
+on ability.ability_soc_id = know.knowledge_soc_id
+
+where ability.abilities_title = know.knowledge_title
+
+
+
+
+3 final :
+
+Select * from
+
+(select a.soc_id as ability_soc_id, a.title as abilities_title, a.element_name as abilities_element_name, a.level as abilities_level, b.importance as abilities_importance,
+ (a.level + b.importance)/2 as average_ability
+ from 
+(select k.soc_id, k.title, k.element_name, k.data_value as Level from abilities k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.element_name, k.data_value as Importance from abilities k where k.scale_name = 'Importance')b)ability
+
+join
+
+(select a.soc_id as knowledge_soc_id, a.title as knowledge_title, a.element_name as knowledge_element_name, a.level as knowledge_level, b.importance as knowledge_importance, 
+(a.level + b.importance)/2 as average_knowledge
+ from 
+(select k.soc_id, k.title, k.element_name, k.data_value as Level from knowledge k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.element_name, k.data_value as Importance from knowledge k where k.scale_name = 'Importance')b)know
+
+on ability.ability_soc_id = know.knowledge_soc_id 
+
+
+join
+
+(select a.soc_id as skills_soc_id, a.title as skills_title, a.element_name as skills_element_name, a.level as skills_level, b.importance as skills_importance, 
+(a.level + b.importance)/2 as average_skills
+ from 
+(select k.soc_id, k.title, k.element_name, k.data_value as Level from skills k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.element_name, k.data_value as Importance from skills k where k.scale_name = 'Importance')b)skill
+
+on ability.ability_soc_id = skill.skills_soc_id 
+
+
+where ability.abilities_title = know.knowledge_title
+and ability.abilities_title = skill.skills_title
+
+
+3 new :
+
+
+Select * from
+
+(select a.soc_id as ability_soc_id, a.title as abilities_title, a.level as abilities_level, b.importance as abilities_importance,
+ (a.level + b.importance)/2 as average_ability
+ from 
+(select k.soc_id, k.title, k.data_value as Level from abilities k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.data_value as Importance from abilities k where k.scale_name = 'Importance')b)ability
+
+join
+
+(select a.soc_id as knowledge_soc_id, a.title as knowledge_title, a.level as knowledge_level, b.importance as knowledge_importance, 
+(a.level + b.importance)/2 as average_knowledge
+ from 
+(select k.soc_id, k.title, k.data_value as Level from knowledge k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.data_value as Importance from knowledge k where k.scale_name = 'Importance')b)know
+
+on ability.ability_soc_id = know.knowledge_soc_id
+
+natural join
+
+(select a.soc_id as skills_soc_id, a.title as skills_title, a.level as skills_level, b.importance as skills_importance, 
+(a.level + b.importance)/2 as average_skills
+ from 
+(select k.soc_id, k.title, k.data_value as Level from skills k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.data_value as Importance from skills k where k.scale_name = 'Importance')b)skill
+
+
+
+next_1 :
+
+select count(x.*) from 
+
+(select distinct average_ability, know.ability_soc_id , know.abilities_title , know.abilities_level , know.abilities_importance
+
+from 
+
+(select a.soc_id as ability_soc_id, a.title as abilities_title, a.level as abilities_level, b.importance as abilities_importance,
+ (a.level + b.importance)/2 as average_ability 
+ from 
+(select k.soc_id, k.title, k.data_value as Level from abilities k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.data_value as Importance from abilities k where k.scale_name = 'Importance')b)know)x
+
+
+
+check :
+
+select x.ability_soc_id from 
+
+(select average_ability, know.ability_soc_id , know.abilities_title , know.abilities_level , know.abilities_importance
+
+from 
+
+(select a.soc_id as ability_soc_id, a.title as abilities_title, a.level as abilities_level, b.importance as abilities_importance,
+ (a.level + b.importance)/2 as average_ability 
+ from 
+(select k.soc_id, k.title, k.data_value as Level from abilities k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.data_value as Importance from abilities k where k.scale_name = 'Importance')b)know)x , knowledge
+
+where 
+
+x.ability_soc_id not in knowledge.soc_id
+
+
+
+
+working:
+
+(select distinct average_ability, know.ability_soc_id , know.abilities_title , know.abilities_level , know.abilities_importance
+
+from 
+
+(select a.soc_id as ability_soc_id, a.title as abilities_title, a.level as abilities_level, b.importance as abilities_importance,
+ (a.level + b.importance)/2 as average_ability 
+ from 
+(select k.soc_id, k.title, k.data_value as Level from abilities k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.data_value as Importance from abilities k where k.scale_name = 'Importance')b)know)
+
+
+
+
+check :
+
+select distinct y.abilities_title, y.ability_soc_id,y.average_ability, y.abilities_level, y.abilities_importance, 
+y.average_knowledge,y.knowledge_level , y.knowledge_importance
+
+from
+
+(
+
+(select distinct average_ability, know.ability_soc_id , know.abilities_title , know.abilities_level , know.abilities_importance
+
+from 
+
+(
+(select a.soc_id as ability_soc_id, a.title as abilities_title, a.level as abilities_level, b.importance as abilities_importance,
+ (a.level + b.importance)/2 as average_ability 
+ from 
+(select k.soc_id, k.title, k.data_value as Level from abilities k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.data_value as Importance from abilities k where k.scale_name = 'Importance')b)know) ability
+
+inner join 
+
+(select distinct average_knowledge, know.knowledge_soc_id , know.knowledge_title , know.knowledge_level , know.knowledge_importance
+
+from 
+
+(select a.soc_id as knowledge_soc_id, a.title as knowledge_title, a.level as knowledge_level, b.importance as knowledge_importance, 
+(a.level + b.importance)/2 as average_knowledge
+ from 
+(select k.soc_id, k.title, k.element_name, k.data_value as Level from knowledge k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.element_name, k.data_value as Importance from knowledge k where k.scale_name = 'Importance')b)know)knowl
+
+on
+
+ability.ability_soc_id = knowl.knowledge_soc_id 
+
+)y
+
+
+
+new _check :
+
+
+select distinct y.abilities_title, y.ability_soc_id,y.average_ability, y.abilities_level, y.abilities_importance, 
+y.average_knowledge,y.knowledge_level , y.knowledge_importance
+
+from
+
+(
+
+(select distinct average_ability, know.ability_soc_id , know.abilities_title , know.abilities_level , know.abilities_importance
+
+from 
+(select a.soc_id as ability_soc_id, a.title as abilities_title, a.level as abilities_level, b.importance as abilities_importance,
+ (a.level + b.importance)/2 as average_ability 
+ from 
+(select k.soc_id, k.title, k.data_value as Level from abilities k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.data_value as Importance from abilities k where k.scale_name = 'Importance')b
+ )know) ability
+
+join 
+
+(select distinct average_knowledge, know.knowledge_soc_id , know.knowledge_title , know.knowledge_level , know.knowledge_importance
+
+from 
+
+(select a.soc_id as knowledge_soc_id, a.title as knowledge_title, a.level as knowledge_level, b.importance as knowledge_importance, 
+(a.level + b.importance)/2 as average_knowledge
+ from 
+(select k.soc_id, k.title, k.element_name, k.data_value as Level from knowledge k where k.scale_name = 'Level')a
+natural join
+(select k.soc_id, k.title, k.element_name, k.data_value as Importance from knowledge k where k.scale_name = 'Importance')b)know)knowl
+
+on
+
+ability.ability_soc_id = knowl.knowledge_soc_id 
+
+)y
+
